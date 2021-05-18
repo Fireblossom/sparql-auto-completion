@@ -1,10 +1,8 @@
-# LSP Example
-
-Heavily documented sample code for https://code.visualstudio.com/api/language-extensions/language-server-extension-guide
-
+# sparql-auto-completion
+Forked from `https://github.com/Microsoft/vscode-extension-samples/tree/main/lsp-sample`
 ## Functionality
 
-This Language Server works for plain text file. It has the following language features:
+This Language Server works for SPARQL queries. It has the following language features:
 - Completions
 - Diagnostics regenerated on each file change or configuration change
 
