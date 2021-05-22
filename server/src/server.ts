@@ -5,13 +5,10 @@
 import {
 	createConnection,
 	TextDocuments,
-	Diagnostic,
-	DiagnosticSeverity,
 	ProposedFeatures,
 	InitializeParams,
 	DidChangeConfigurationNotification,
 	CompletionItem,
-	CompletionItemKind,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
 	InitializeResult,
@@ -23,7 +20,9 @@ import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
 
-import axios, { AxiosResponse } from 'axios';
+import axios, {
+	AxiosResponse
+} from 'axios';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
