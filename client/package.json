@@ -4,7 +4,7 @@
 	"author": "Fireblossom",
 	"license": "MIT",
 	"version": "0.0.1",
-	"publisher": "none",
+	"publisher": "Fireblossom",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Fireblossom/sparql-auto-completion"
