@@ -1,10 +1,12 @@
 # sparql-auto-completion
 
 Forked from https://github.com/Microsoft/vscode-extension-samples/tree/main/lsp-sample
+
 ## Functionality
 
 This Language Server works for SPARQL queries. It has the following language features:
-- Completions
+
+- Completions prefix
 - Diagnostics regenerated on each file change or configuration change
 
 It also includes an End-to-End test.
@@ -33,10 +35,9 @@ It also includes an End-to-End test.
 - Run the launch config.
 - If you want to debug the server as well use the launch configuration `Attach to Server`
 - In the [Extension Development Host] instance of VSCode, open a document in 'plain text' language mode.
-  - Type `j` or `t` to see `Javascript` and `TypeScript` completion.
-  - Enter text content such as `AAA aaa BBB`. The extension will emit diagnostics for all words in all-uppercase.
+  - Enter text content such as `foaf:`. The extension will auto-compelte the prefix `PREFIX foaf: <http://xmlns.com/foaf/0.1/>` to the file head.
 
 ## Next step
 
-- [ ] auto-import PREFIX (from http://prefix.cc/)
+- [x] auto-import PREFIX (from http://prefix.cc/)
 - [ ] Entities and properties validation

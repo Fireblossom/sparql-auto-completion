@@ -14,12 +14,16 @@ import {
 	CompletionItemKind,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
-	InitializeResult
+	InitializeResult,
+	WorkspaceChange,
+	Position
 } from 'vscode-languageserver/node';
 
 import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
+
+import axios, { AxiosResponse } from 'axios';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -132,7 +136,57 @@ documents.onDidClose(e => {
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent(change => {
 	validateTextDocument(change.document);
+	completeTextDocument(change.document);
 });
+
+async function completeTextDocument(textDocument: TextDocument): Promise<void> {
+
+	const settings = await getDocumentSettings(textDocument.uri);
+
+	const text = textDocument.getText();
+
+	const prefix = new Set();
+	for (const line of text.split(/[\r\n]+/)){
+		if(line.substr(0, 6) == 'PREFIX' || line.substr(0, 6) == 'prefix'){
+			prefix.add(line.split(' ')[1]);
+		}
+		else{
+			const pattern = /[a-zA-Z]{2,}:(?![/]+)/g;
+			let m: RegExpExecArray | null;
+
+			const addPrefix: string[] = [];
+			let problems = 0;
+			while ((m = pattern.exec(line)) && problems < settings.maxNumberOfProblems) {
+				problems++;
+				addPrefix.push(m[0]);
+			}
+			if (addPrefix.length > 0){
+				const workspaceChange = new WorkspaceChange();
+				const textChange = workspaceChange.getTextEditChange(textDocument.uri);
+				let response: AxiosResponse;
+				const prefixURL: string[] = [];
+				let p:string;
+				for (p of addPrefix) {
+					console.log(p);
+					if(!prefix.has(p)){
+						const URL:string = 'http://prefix.cc/' + p.substr(0, p.length-1) + '.file.sparql';
+						try {
+							response = await axios.get(URL);
+							prefixURL.push(response.data);
+							textChange.insert(Position.create(0, 0), response.data);
+							prefix.add(p);
+						} catch(error){
+							connection.console.warn('Prefix name error.');
+						}
+					}else{
+						continue;
+					}
+				}
+				await connection.workspace.applyEdit(workspaceChange.edit);
+			}
+		}
+	}
+}
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// In this simple example we get the settings for every validate run.
@@ -140,7 +194,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
 	// The validator creates diagnostics for all uppercase words length 2 and more
 	const text = textDocument.getText();
-	const pattern = /\b[A-Z]{2,}\b/g;
+	const pattern = /[a-zA-Z]{2,}:$/g;
 	let m: RegExpExecArray | null;
 
 	let problems = 0;
@@ -156,29 +210,11 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 			message: `${m[0]} is all uppercase.`,
 			source: 'ex'
 		};
-		if (hasDiagnosticRelatedInformationCapability) {
-			diagnostic.relatedInformation = [
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Spelling matters'
-				},
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Particularly for names'
-				}
-			];
-		}
 		diagnostics.push(diagnostic);
 	}
 
 	// Send the computed diagnostics to VSCode.
-	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+	//connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }
 
 connection.onDidChangeWatchedFiles(_change => {
@@ -188,122 +224,23 @@ connection.onDidChangeWatchedFiles(_change => {
 
 // This handler provides the initial list of the completion items.
 connection.onCompletion(
-	(_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+	async (_textDocumentPosition: TextDocumentPositionParams): Promise<CompletionItem[]> => {
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
 		// info and always provide the same completion items.
-		//if(_textDocumentPosition.position)
+		let response:AxiosResponse;
+		const baseUrl = 'http://prefix.cc/rdfss.file.sparql';
+		try{
+			response = await axios.get(baseUrl);
+		} catch (exception) {
+			response = await axios.get('http://prefix.cc/dbo.file.sparql');
+		}
 		return [
 			{
-				label: 'SELECT',
-				kind: CompletionItemKind.Keyword,
-				data: 1
+			label: 'SELECT' + response.data,
+			kind: CompletionItemKind.Keyword,
+			data: 1
 			},
-			{
-				label: 'WHERE',
-				kind: CompletionItemKind.Keyword,
-				data: 2
-			},
-			{
-				label: 'PREFIX',
-				kind: CompletionItemKind.Keyword,
-				data: 3
-			},
-			{
-				label: 'GROUP BY',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'CONSTRUCT',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'ASK',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'DESCRIBE',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'UNION',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'MINUS',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'FILTER',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'NAMED',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'FROM',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'SERVICE',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'INSERT DATA',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'DELETE DATA',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'DELETE',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'INSERT',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'LOAD',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'INTO GRAPH',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'CLEAR GRAPH',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'CREATAE GRAPH',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			},
-			{
-				label: 'DROP GRAPH',
-				kind: CompletionItemKind.Keyword,
-				data: 4
-			}
 		];
 	}
 );
@@ -312,15 +249,6 @@ connection.onCompletion(
 // the completion list.
 connection.onCompletionResolve(
 	(item: CompletionItem): CompletionItem => {
-		/*
-		if (item.data === 1) {
-			item.detail = 'TypeScript details';
-			item.documentation = 'TypeScript documentation';
-		} else if (item.data === 2) {
-			item.detail = 'JavaScript details';
-			item.documentation = 'JavaScript documentation';
-		}
-		*/
 		return item;
 	}
 );
