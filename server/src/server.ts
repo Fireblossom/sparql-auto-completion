@@ -85,26 +85,26 @@ connection.onInitialized(() => {
 });
 
 // The example settings
-interface ExampleSettings {
+interface SPARQLPREFIXSettings {
 	maxNumberOfProblems: number;
 }
 
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
 // Please note that this is not the case when using this server with the client provided in this example
 // but could happen with other clients.
-const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
-let globalSettings: ExampleSettings = defaultSettings;
+const defaultSettings: SPARQLPREFIXSettings = { maxNumberOfProblems: 1000 };
+let globalSettings: SPARQLPREFIXSettings = defaultSettings;
 
 // Cache the settings of all open documents
-const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
+const documentSettings: Map<string, Thenable<SPARQLPREFIXSettings>> = new Map();
 
 connection.onDidChangeConfiguration(change => {
 	if (hasConfigurationCapability) {
 		// Reset all cached document settings
 		documentSettings.clear();
 	} else {
-		globalSettings = <ExampleSettings>(
-			(change.settings.languageServerExample || defaultSettings)
+		globalSettings = <SPARQLPREFIXSettings>(
+			(change.settings.languageServerSPARQLPREFIX || defaultSettings)
 		);
 	}
 
@@ -112,7 +112,7 @@ connection.onDidChangeConfiguration(change => {
 	//documents.all().forEach(validateTextDocument);
 });
 
-function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
+function getDocumentSettings(resource: string): Thenable<SPARQLPREFIXSettings> {
 	if (!hasConfigurationCapability) {
 		return Promise.resolve(globalSettings);
 	}
@@ -120,7 +120,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 	if (!result) {
 		result = connection.workspace.getConfiguration({
 			scopeUri: resource,
-			section: 'languageServerExample'
+			section: 'languageServerSPARQLPREFIX'
 		});
 		documentSettings.set(resource, result);
 	}
@@ -228,7 +228,7 @@ connection.onCompletion(
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
 		// info and always provide the same completion items.
-		let response:AxiosResponse;
+		/*let response:AxiosResponse;
 		const baseUrl = 'http://prefix.cc/rdfss.file.sparql';
 		try{
 			response = await axios.get(baseUrl);
@@ -241,7 +241,8 @@ connection.onCompletion(
 			kind: CompletionItemKind.Keyword,
 			data: 1
 			},
-		];
+		];*/
+		return [];
 	}
 );
 

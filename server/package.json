@@ -1,6 +1,6 @@
 {
 	"name": "sparql-auto-completion-server",
-	"description": "Example implementation of a language server in node.",
+	"description": "SPARQLPREFIX implementation of a language server in node.",
 	"version": "1.0.0",
 	"author": "Microsoft Corporation",
 	"license": "MIT",

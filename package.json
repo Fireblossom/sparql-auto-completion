@@ -25,13 +25,13 @@
 			"type": "object",
 			"title": "SPARQL configuration",
 			"properties": {
-				"languageServerExample.maxNumberOfProblems": {
+				"languageServerSPARQLPREFIX.maxNumberOfProblems": {
 					"scope": "resource",
 					"type": "number",
 					"default": 100,
 					"description": "Controls the maximum number of problems produced by the server."
 				},
-				"languageServerExample.trace.server": {
+				"languageServerSPARQLPREFIX.trace.server": {
 					"scope": "window",
 					"type": "string",
 					"enum": [
