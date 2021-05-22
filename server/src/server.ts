@@ -13,7 +13,8 @@ import {
 	TextDocumentSyncKind,
 	InitializeResult,
 	WorkspaceChange,
-	Position
+	Position,
+	CompletionItemKind
 } from 'vscode-languageserver/node';
 
 import {
@@ -146,7 +147,7 @@ async function completeTextDocument(textDocument: TextDocument): Promise<void> {
 
 	const prefix = new Set();
 	for (const line of text.split(/[\r\n]+/)){
-		if(line.substr(0, 6) == 'PREFIX' || line.substr(0, 6) == 'prefix'){
+		if(line.substring(0, 6) == 'PREFIX' || line.substring(0, 6) == 'prefix'){
 			prefix.add(line.split(' ')[1]);
 		}
 		else{
@@ -166,9 +167,9 @@ async function completeTextDocument(textDocument: TextDocument): Promise<void> {
 				const prefixURL: string[] = [];
 				let p:string;
 				for (p of addPrefix) {
-					console.log(p);
 					if(!prefix.has(p)){
-						const URL:string = 'http://prefix.cc/' + p.substr(0, p.length-1) + '.file.sparql';
+						const URL:string = 'http://prefix.cc/' + p.substring(0, p.length-1) + '.file.sparql';
+						//console.log(p.substring(0, p.length-1));
 						try {
 							response = await axios.get(URL);
 							prefixURL.push(response.data);
@@ -227,20 +228,58 @@ connection.onCompletion(
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
 		// info and always provide the same completion items.
-		/*let response:AxiosResponse;
-		const baseUrl = 'http://prefix.cc/rdfss.file.sparql';
-		try{
-			response = await axios.get(baseUrl);
-		} catch (exception) {
-			response = await axios.get('http://prefix.cc/dbo.file.sparql');
+		const textUri:string = _textDocumentPosition.textDocument.uri;
+		const text = documents.get(textUri)?.getText();
+		//console.log(text);
+		if(text){
+			const position :Position = _textDocumentPosition.position;
+			const line: string = text.split(/[\r\n]+/)[position.line];
+			let i:number = position.character-1;
+			let isQuery = false;
+			//console.log(position.line, position.character);
+			while(line.charAt(i) != ' ' && i > 0){
+				i--;
+				if(line.charAt(i) == ':'){
+					isQuery = true;
+				}
+			}
+			if(i>0)i++;
+			const word:string = line.substring(i, position.character+1);
+
+			if(isQuery){
+				const prefix = new Map<string, string>();
+				for (const line of text.split(/[\r\n]+/)){
+					if(line.substring(0, 6) == 'PREFIX' || line.substring(0, 6) == 'prefix'){
+						prefix.set(line.split(' ')[1], line.split(' ')[2].substring(1, line.split(' ')[2].length-1));
+					}else{
+						break;
+					}
+				}
+				
+				const queryPrefix:string = word.split(':', 1)[0];
+				const querySuffix:string = word.split(':', 1)[1];
+				if(prefix.has(queryPrefix)){
+					let response:AxiosResponse;
+					const baseUrl = 'https://lov.linkeddata.es/dataset/lov/api/v2/term/autocomplete?q=';
+					const query:string = prefix.get(queryPrefix)+querySuffix;
+					try{
+						response = await axios.get(baseUrl+query);
+						if(response.data.total_results > 0){
+							const result: CompletionItem[] = [];
+							for(const r of response.data.results){
+								result.push({
+									label: queryPrefix+r.localName[0],
+									kind: CompletionItemKind.Property
+								});
+							}
+							return result;
+						}
+					} catch (exception) {
+						connection.console.log('Bad query.');
+					}
+				}
+			}
 		}
-		return [
-			{
-			label: 'SELECT' + response.data,
-			kind: CompletionItemKind.Keyword,
-			data: 1
-			},
-		];*/
 		return [];
 	}
 );
