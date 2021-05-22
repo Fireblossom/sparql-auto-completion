@@ -2,12 +2,13 @@
 
 Forked from https://github.com/Microsoft/vscode-extension-samples/tree/main/lsp-sample
 
+Please use https://marketplace.visualstudio.com/items?itemName=stardog-union.vscode-langserver-sparql for syntax highlighting.
+
 ## Functionality
 
 This Language Server works for SPARQL queries. It has the following language features:
 
 - Completions prefix
-- Diagnostics regenerated on each file change or configuration change
 
 It also includes an End-to-End test.
 
