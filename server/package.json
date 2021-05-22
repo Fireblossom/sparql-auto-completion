@@ -2,11 +2,12 @@
 	"name": "sparql-auto-completion-server",
 	"description": "SPARQLPREFIX implementation of a language server in node.",
 	"version": "1.0.0",
-	"author": "Microsoft Corporation",
+	"author": "Fireblossom",
 	"license": "MIT",
 	"engines": {
 		"node": "*"
 	},
+	"publisher": "Fireblossom",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Fireblossom/sparql-auto-completion"

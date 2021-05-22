@@ -2,5 +2,5 @@ out
 node_modules
 client/server
 .vscode-test
-sparql-auto-completion-0.0.1.vsix
+*.vsix
 .DS_Store
