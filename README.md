@@ -41,4 +41,4 @@ It also includes an End-to-End test.
 ## Next step
 
 - [x] auto-import PREFIX (from http://prefix.cc/)
-- [ ] Entities and properties validation
+- [ ] Entities and properties validation (from https://lov.linkeddata.es/)
