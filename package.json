@@ -64,6 +64,6 @@
 	"dependencies": {
 		"axios": "^0.21.1",
 		"lru-cache": "6.0.0",
-		"minimatch":"3.0.4"
+		"minimatch": "3.0.4"
 	}
 }

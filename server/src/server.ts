@@ -146,7 +146,7 @@ async function completeTextDocument(textDocument: TextDocument): Promise<void> {
 	const text = textDocument.getText();
 
 	const prefix = new Set();
-	for (const line of text.split(/[\r\n]+/)){
+	for (const line of text.split(/\r?\n/)){
 		if(line.substring(0, 6) == 'PREFIX' || line.substring(0, 6) == 'prefix'){
 			prefix.add(line.split(' ')[1]);
 		}
@@ -233,7 +233,7 @@ connection.onCompletion(
 		//console.log(text);
 		if(text){
 			const position :Position = _textDocumentPosition.position;
-			const line: string = text.split(/[\r\n]+/)[position.line];
+			const line: string = text.split(/\r?\n/)[position.line];
 			let i:number = position.character-1;
 			let isQuery = false;
 			//console.log(position.line, position.character);
@@ -248,7 +248,7 @@ connection.onCompletion(
 
 			if(isQuery){
 				const prefix = new Map<string, string>();
-				for (const line of text.split(/[\r\n]+/)){
+				for (const line of text.split(/\r?\n/)){
 					if(line.substring(0, 6) == 'PREFIX' || line.substring(0, 6) == 'prefix'){
 						prefix.set(line.split(' ')[1], line.split(' ')[2].substring(1, line.split(' ')[2].length-1));
 					}else{
@@ -256,22 +256,29 @@ connection.onCompletion(
 					}
 				}
 				
-				const queryPrefix:string = word.split(':', 1)[0];
-				const querySuffix:string = word.split(':', 1)[1];
-				if(prefix.has(queryPrefix)){
+				const queryPrefix:string = word.split(':')[0];
+				let querySuffix:string;
+				if(word.split(':').length > 1){
+					querySuffix = word.split(':')[1];
+				}else{
+					querySuffix = '';
+				}
+				
+				if(prefix.has(queryPrefix+':')){
 					let response:AxiosResponse;
 					const baseUrl = 'https://lov.linkeddata.es/dataset/lov/api/v2/term/autocomplete?q=';
-					const query:string = prefix.get(queryPrefix)+querySuffix;
+					const query:string = prefix.get(queryPrefix+':')+querySuffix;
 					try{
 						response = await axios.get(baseUrl+query);
 						if(response.data.total_results > 0){
 							const result: CompletionItem[] = [];
 							for(const r of response.data.results){
 								result.push({
-									label: queryPrefix+r.localName[0],
+									label: queryPrefix+':'+r.localName[0],
 									kind: CompletionItemKind.Property
 								});
 							}
+							console.log(result);
 							return result;
 						}
 					} catch (exception) {
