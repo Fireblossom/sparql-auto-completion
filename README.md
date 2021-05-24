@@ -11,7 +11,7 @@ This Language Server works for SPARQL queries. It has the following language fea
 - Auto complete prefix
 - IntelliSense for terms (`class` or `property`)
 
-![](Screen Recording 2021-05-24 at 20.40.38.gif)
+![record](https://user-images.githubusercontent.com/16226671/119395733-3ef0f700-bcd4-11eb-8c33-24295774b174.gif)
 
 ## Structure
 
