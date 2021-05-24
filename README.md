@@ -8,7 +8,8 @@ Please use https://marketplace.visualstudio.com/items?itemName=stardog-union.vsc
 
 This Language Server works for SPARQL queries. It has the following language features:
 
-- Complete prefix
+- Auto complete prefix
+- IntelliSense for terms (`class` or `property`)
 
 ## Structure
 
@@ -32,5 +33,5 @@ This Language Server works for SPARQL queries. It has the following language fea
 ## Next steps
 
 - [x] auto-import PREFIX (from http://prefix.cc/)
-- [ ] Entities and properties auto-complete (from https://lov.linkeddata.es/)
+- [x] Entities and properties auto-complete (from https://lov.linkeddata.es/)
 - [ ] Validate

@@ -267,14 +267,14 @@ connection.onCompletion(
 				if(prefix.has(queryPrefix+':')){
 					let response:AxiosResponse;
 					const baseUrl = 'https://lov.linkeddata.es/dataset/lov/api/v2/term/autocomplete?q=';
-					const query:string = prefix.get(queryPrefix+':')+querySuffix;
+					const query:string = encodeURI(prefix.get(queryPrefix+':')+querySuffix);
 					try{
 						response = await axios.get(baseUrl+query);
 						if(response.data.total_results > 0){
 							const result: CompletionItem[] = [];
 							for(const r of response.data.results){
 								result.push({
-									label: queryPrefix+':'+r.localName[0],
+									label: r.localName[0], //queryPrefix+':'+r.localName[0],
 									kind: CompletionItemKind.Property
 								});
 							}
