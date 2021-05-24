@@ -5,5 +5,22 @@
 	"typescript.preferences.quoteStyle": "single",
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": true
-	}
+	},
+	"grammarly.overrides": [
+		{
+			"files": [
+				"**/README.md"
+			],
+			"config": {
+				"audience": "expert",
+				"dialect": "american",
+				"domain": "general",
+				"emotions": [],
+				"goals": [
+					"inform",
+					"describe"
+				]
+			}
+		}
+	]
 }
