@@ -36,4 +36,4 @@ This Language Server works for SPARQL queries. It has the following language fea
 
 - [x] auto-import PREFIX (from http://prefix.cc/)
 - [x] Entities and properties auto-complete (from https://lov.linkeddata.es/)
-- [ ] Validate
+- [ ] Validate (SHACL)
