@@ -1,4 +1,4 @@
-# sparql-auto-completion
+# [sparql-auto-completion](https://marketplace.visualstudio.com/items?itemName=Fireblossom.sparql-auto-completion)
 
 Forked from https://github.com/Microsoft/vscode-extension-samples/tree/main/lsp-sample
 
